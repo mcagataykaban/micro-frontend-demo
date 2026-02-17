@@ -5,14 +5,14 @@ A working multi-framework micro-frontend monorepo using **Module Federation** wi
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                     HOST (React + TS)                        │
-│                     localhost:5001                            │
+│                     localhost:5001                           │
 │                                                              │
-│   ┌──────────┐   ┌────────────────┐   ┌───────────────────┐ │
-│   │  Home    │   │  /billing ─────────> BILLING (Vue 3)   │ │
-│   │  page    │   │                │   │  localhost:5002    │ │
-│   │  (React) │   │  /support ─────────> SUPPORT (Svelte)  │ │
-│   │          │   │                │   │  localhost:5003    │ │
-│   └──────────┘   └────────────────┘   └───────────────────┘ │
+│   ┌──────────┐   ┌────────────────┐   ┌───────────────────┐  │
+│   │  Home    │   │  /billing ─────────> BILLING (Vue 3)   │  │
+│   │  page    │   │                │   │  localhost:5002   │  │
+│   │  (React) │   │  /support ─────────> SUPPORT (Svelte)  │  │
+│   │          │   │                │   │  localhost:5003   │  │
+│   └──────────┘   └────────────────┘   └───────────────────┘  │
 │                                                              │
 │   ┌──────────────────────────────────────────────────────┐   │
 │   │          Shared Event Bus (window singleton)         │   │
