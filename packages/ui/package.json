@@ -1,0 +1,14 @@
+{
+  "name": "@mf-demo/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "styles.css",
+  "exports": {
+    ".": "./styles.css",
+    "./styles.css": "./styles.css"
+  },
+  "scripts": {
+    "build": "echo 'CSS-only package, no build needed'"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "micro-frontend-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Micro-frontend demo with React host, Vue billing remote, and Svelte support remote",
+  "scripts": {
+    "build:shared": "pnpm --filter @mf-demo/shared build",
+    "build:remotes": "pnpm --filter billing-vue build && pnpm --filter support-svelte build",
+    "build": "pnpm build:shared && pnpm -r --filter ./apps/* build",
+    "dev": "pnpm build:shared && pnpm build:remotes && concurrently -n host,billing,billing-w,support,support-w -c cyan,yellow,yellow.dim,green,green.dim \"pnpm --filter host-react dev\" \"pnpm --filter billing-vue preview\" \"pnpm --filter billing-vue dev:watch\" \"pnpm --filter support-svelte preview\" \"pnpm --filter support-svelte dev:watch\"",
+    "preview": "concurrently -n host,billing,support -c cyan,yellow,green \"pnpm --filter host-react preview\" \"pnpm --filter billing-vue preview\" \"pnpm --filter support-svelte preview\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
