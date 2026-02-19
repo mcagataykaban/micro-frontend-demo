@@ -104,7 +104,47 @@ Host: eventBus.on(NAVIGATE, (path) => { navigate(path) })
 
 **Key point**: Keep shared packages framework-agnostic. Types and styles are the common ground.
 
-### 7. Discussion: When to use micro-frontends (5–10 min)
+### 7. Lazy loading demo: On-demand remote widget (5 min)
+
+**Setup:** Open the **Network tab** in DevTools before starting. Filter by JS requests.
+
+**Steps:**
+
+1. Navigate to the **Home page** (localhost:5001)
+2. Point out the "Lazy Loading Demo" section at the bottom
+3. Note: **no `remoteEntry.js` from localhost:5002 has loaded yet** — the billing remote is not fetched on the home page
+4. Click **"Load Billing Stats Widget"**
+   - Watch the Network tab: `remoteEntry.js` + `BillingStats-*.js` + `vue-*.js` load on demand
+   - The Billing Stats widget (Vue component) appears with invoice summary cards
+5. Click **"Hide Billing Stats"** — the widget hides, but no new network requests
+6. Click **"Load Billing Stats Widget"** again — it reappears instantly (already cached)
+
+**Show the code** (`apps/host-react/src/App.tsx` — `HomePage` component):
+
+```tsx
+const loadBillingStats = async () => {
+  const mod = await import("billing/BillingStats");   // dynamic import → triggers remoteEntry.js fetch
+  setStatsComponent(() => mod.default);
+  setShowStats(true);
+};
+```
+
+**Key points:**
+- No `React.lazy()` or `<Suspense>` needed — just a plain dynamic `import()` triggered by user action
+- The remote entry and its chunk are fetched **only when the button is clicked**
+- The Vue component renders inside the React host via a thin wrapper (`BillingStatsWrapper.tsx`)
+- After the first load, the module is cached — subsequent toggles are instant
+
+**Config highlight** (`apps/billing-vue/vite.config.ts`):
+```ts
+exposes: {
+  "./BillingPage": "./src/BillingPageWrapper.tsx",    // full page (loaded via route)
+  "./BillingStats": "./src/BillingStatsWrapper.tsx",  // widget (loaded on demand)
+}
+```
+A single remote can expose multiple components — pages, widgets, sidebars — each loaded independently.
+
+### 8. Discussion: When to use micro-frontends (5–10 min)
 
 **Good fit:**
 - Multiple teams that need deployment autonomy
@@ -157,5 +197,7 @@ Before the session:
 - [ ] /support loads the Svelte remote
 - [ ] Login/Logout toggle works and propagates
 - [ ] "Create Support Ticket" from billing navigates to support with prefilled form
+- [ ] "Load Billing Stats Widget" on Home loads remoteEntry.js on demand (check Network tab)
+- [ ] Hiding and re-showing the widget doesn't trigger new network requests
 - [ ] Killing port 5002 shows error boundary on /billing
 - [ ] Other routes still work when one remote is down
