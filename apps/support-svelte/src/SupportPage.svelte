@@ -15,18 +15,30 @@
   let unsubAuth: (() => void) | undefined;
   let unsubTicket: (() => void) | undefined;
 
+  function handleCreateTicket(payload: CreateTicketPayload) {
+    newTicketTitle = `Issue with ${payload.invoiceId}: ${payload.invoiceTitle}`;
+    newTicketDescription = `Regarding invoice ${payload.invoiceId} — ${payload.invoiceTitle}.\n\nPlease describe the issue:`;
+    newTicketInvoiceId = payload.invoiceId;
+    showNewTicketForm = true;
+    selectedTicket = null;
+  }
+
   onMount(() => {
     unsubAuth = eventBus.on<AuthState>(Events.AUTH_CHANGED, (state) => {
       auth = state;
     });
 
-    unsubTicket = eventBus.on<CreateTicketPayload>(Events.CREATE_TICKET, (payload) => {
-      newTicketTitle = `Issue with ${payload.invoiceId}: ${payload.invoiceTitle}`;
-      newTicketDescription = `Regarding invoice ${payload.invoiceId} — ${payload.invoiceTitle}.\n\nPlease describe the issue:`;
-      newTicketInvoiceId = payload.invoiceId;
-      showNewTicketForm = true;
-      selectedTicket = null;
-    });
+    unsubTicket = eventBus.on<CreateTicketPayload>(Events.CREATE_TICKET, handleCreateTicket);
+
+    // Check for pending CREATE_TICKET payload (handles race condition when navigating from Billing)
+    // Don't delete immediately — React StrictMode may destroy and re-create this component.
+    // The last mount wins, which is the one that survives.
+    const w = window as any;
+    if (w.__MF_PENDING_TICKET__) {
+      handleCreateTicket(w.__MF_PENDING_TICKET__ as CreateTicketPayload);
+      // Clean up after StrictMode settles
+      setTimeout(() => { delete w.__MF_PENDING_TICKET__; }, 200);
+    }
   });
 
   onDestroy(() => {

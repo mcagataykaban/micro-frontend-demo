@@ -2,6 +2,7 @@ type Listener<T = unknown> = (payload: T) => void;
 
 class EventBus {
   private listeners = new Map<string, Set<Listener>>();
+  private pendingPayloads = new Map<string, unknown>();
 
   on<T = unknown>(event: string, listener: Listener<T>): () => void {
     if (!this.listeners.has(event)) {
@@ -24,12 +25,32 @@ class EventBus {
     }
   }
 
+  /**
+   * Emit an event and store the payload for late subscribers.
+   * Use this when the target component may not be mounted yet.
+   */
+  emitSticky<T = unknown>(event: string, payload: T): void {
+    this.pendingPayloads.set(event, payload);
+    this.emit(event, payload);
+  }
+
+  /**
+   * Consume a pending payload for an event (if any).
+   * Returns the payload and clears it, or undefined if none exists.
+   */
+  consumePending<T = unknown>(event: string): T | undefined {
+    const payload = this.pendingPayloads.get(event) as T | undefined;
+    this.pendingPayloads.delete(event);
+    return payload;
+  }
+
   off(event: string): void {
     this.listeners.delete(event);
   }
 
   clear(): void {
     this.listeners.clear();
+    this.pendingPayloads.clear();
   }
 }
 

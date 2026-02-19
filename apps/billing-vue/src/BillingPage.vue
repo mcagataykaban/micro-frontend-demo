@@ -18,6 +18,9 @@ function createTicket(invoice: Invoice) {
     invoiceId: invoice.id,
     invoiceTitle: invoice.title,
   };
+  // Store on window to survive navigation (event bus might miss due to lazy loading race)
+  (window as any).__MF_PENDING_TICKET__ = payload;
+  console.log('[Billing] Created pending ticket:', payload);
   eventBus.emit(Events.CREATE_TICKET, payload);
   eventBus.emit(Events.NAVIGATE, "/support");
 }
