@@ -1,1 +1,1 @@
-{"root":["./src/data.ts","./src/main.ts","./src/billingpage.vue","./vite-env.d.ts"],"version":"5.9.3"}
+{"root":["./src/data.ts","./src/main.ts","./src/billingpage.vue","./src/billingstats.vue","./vite-env.d.ts"],"version":"5.9.3"}

@@ -3,6 +3,11 @@ declare module "billing/BillingPage" {
   export default BillingPage;
 }
 
+declare module "billing/BillingStats" {
+  const BillingStats: React.ComponentType;
+  export default BillingStats;
+}
+
 declare module "support/SupportPage" {
   const SupportPage: React.ComponentType;
   export default SupportPage;

@@ -56,6 +56,28 @@ function LoadingFallback({ name }: { name: string }) {
 }
 
 function HomePage() {
+  const [showStats, setShowStats] = useState(false);
+  const [StatsComponent, setStatsComponent] = useState<React.ComponentType | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const loadBillingStats = async () => {
+    if (StatsComponent) {
+      // Already loaded — just toggle visibility
+      setShowStats((prev) => !prev);
+      return;
+    }
+    setLoading(true);
+    try {
+      const mod = await import("billing/BillingStats");
+      setStatsComponent(() => mod.default);
+      setShowStats(true);
+    } catch (err) {
+      console.error("Failed to load BillingStats:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="home-page">
       <h1>Micro-Frontend Demo</h1>
@@ -105,6 +127,26 @@ function HomePage() {
             Tickets list, cross-app ticket creation
           </p>
         </div>
+      </div>
+
+      <div style={{ marginTop: "var(--space-xl)" }}>
+        <h2 style={{ marginBottom: "var(--space-md)" }}>Lazy Loading Demo</h2>
+        <p className="text-sm text-muted" style={{ marginBottom: "var(--space-md)" }}>
+          The widget below is a Vue component served from the billing remote (localhost:5002).
+          Open the <strong>Network tab</strong> and click the button — you'll see <code>remoteEntry.js</code> load on demand.
+        </p>
+        <button
+          className={`btn ${showStats ? "" : "btn-primary"}`}
+          onClick={loadBillingStats}
+          disabled={loading}
+        >
+          {loading ? "Loading..." : showStats ? "Hide Billing Stats" : "Load Billing Stats Widget"}
+        </button>
+        {showStats && StatsComponent && (
+          <div style={{ marginTop: "var(--space-md)" }}>
+            <StatsComponent />
+          </div>
+        )}
       </div>
     </div>
   );

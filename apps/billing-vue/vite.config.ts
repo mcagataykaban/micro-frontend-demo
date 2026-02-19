@@ -12,6 +12,7 @@ export default defineConfig({
       filename: "remoteEntry.js",
       exposes: {
         "./BillingPage": "./src/BillingPageWrapper.tsx",
+        "./BillingStats": "./src/BillingStatsWrapper.tsx",
       },
       shared: ["vue", "react", "react-dom"],
     }),
